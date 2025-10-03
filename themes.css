@@ -1,192 +1,27 @@
-/* styles.css
-   Shared stylesheet for SweetBites multi-page site.
-   - Two themes: light (default) and dark (black bg + purple fonts)
-   - Keep styles simple and easy to edit.
-*/
+/* === THEME STYLES === */
 
-/* ---------- Variables ---------- */
-:root{
-  --gap: 1rem;
-  --radius: 10px;
-  --purple: #b19cd9; /* purple used in dark theme */
-  --rich-black: #0b0b0b; /* rich black for light theme text */
-  --muted: #6b6b6b;
+/* Light Theme (Default) */
+body[data-theme="light"] {
+    background-color: white;
+    color: black;
 }
 
-/* ---------- Base / Light Theme (default) ---------- */
-* {box-sizing: border-box}
-body {
-  margin: 0;
-  font-family: "Segoe UI", Roboto, system-ui, -apple-system, Arial, sans-serif;
-  background: #fff;
-  color: var(--rich-black);
-  line-height: 1.45;
-  -webkit-font-smoothing:antialiased;
-  transition: background .25s, color .25s;
+/* Dark Theme */
+body[data-theme="dark"] {
+    background-color: black;
+    color: purple;
 }
 
-a { color: var(--rich-black); text-decoration: none; }
-a:hover { text-decoration: underline; }
-
-/* Site wrapper spacing */
-.site { display:flex; min-height:100vh; flex-direction:column; }
-
-/* ---------- NAV ---------- */
-.navbar {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding: 12px 18px;
-  background: #fff;
-  border-bottom: 1px solid #eee;
-  position: sticky;
-  top: 0;
-  z-index: 50;
+/* Example elements you may want to match the theme */
+nav, header, footer {
+    background-color: inherit;
+    color: inherit;
 }
 
-/* Brand */
-.brand a {
-  font-weight:700;
-  font-size:1.25rem;
-  color:var(--rich-black);
+button, .card, .box {
+    background-color: inherit;
+    color: inherit;
+    border: 1px solid currentColor;
 }
 
-/* Links */
-.nav-links { list-style:none; display:flex; gap:12px; margin:0; padding:0; }
-.nav-links a {
-  padding:8px 10px;
-  border-radius:6px;
-  color:var(--muted);
-}
-.nav-links a:hover, .nav-links a.active { color:var(--rich-black); background: rgba(0,0,0,0.03); }
 
-/* Actions (theme button) */
-.actions button {
-  padding:8px 10px;
-  border-radius:8px;
-  background:transparent;
-  border:1px solid #ddd;
-  cursor:pointer;
-}
-
-/* ---------- HERO ---------- */
-.hero {
-  background: linear-gradient(0deg, rgba(0,0,0,0.25), rgba(0,0,0,0.25)), url('https://via.placeholder.com/1600x600?text=SweetBites') center/cover no-repeat;
-  color: #fff;
-  padding:60px 16px;
-  text-align:center;
-}
-.hero h1 { margin:0 0 .5rem; font-size:2.5rem; letter-spacing:0.6px; }
-.tagline { opacity:0.95; margin:0 0 1rem; }
-
-/* ---------- Container ---------- */
-.container {
-  width: min(1100px, 95%);
-  margin: 36px auto;
-  padding-bottom: 40px;
-  flex:1;
-}
-
-/* Intro & featured */
-.intro { text-align:center; margin-bottom:28px; }
-.featured .grid { display:flex; gap:18px; flex-wrap:wrap; justify-content:center; }
-.card {
-  width: 300px;
-  border:1px solid #eee;
-  border-radius: var(--radius);
-  overflow:hidden;
-  text-align:left;
-  background:#fff;
-}
-.card img { width:100%; display:block; height:200px; object-fit:cover; }
-.card h4 { margin:12px 12px 6px; font-size:1.05rem; }
-.card .price { margin:0 12px 12px; color:var(--muted); }
-
-/* Buttons */
-.btn {
-  display:inline-block;
-  background: var(--rich-black);
-  color: #fff;
-  padding:10px 16px;
-  border-radius:8px;
-  text-decoration:none;
-}
-.btn.outline {
-  background:transparent;
-  color:var(--rich-black);
-  border:1px solid #ddd;
-}
-
-/* Page header */
-.page-header { margin-bottom:20px; }
-
-/* Menu grid */
-.menu-grid { display:grid; gap:20px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-.category { border:1px solid #eee; padding:16px; border-radius:8px; }
-
-/* FAQ */
-.faq details { margin:10px 0; padding:12px; border-radius:8px; border:1px solid #eee; background:#fafafa; }
-.faq summary { cursor:pointer; font-weight:600; }
-
-/* Contact form */
-.contact-form { max-width:740px; margin-top:18px; display:grid; gap:12px; }
-.contact-form label { display:block; font-size:0.95rem; }
-.contact-form input[type="text"],
-.contact-form input[type="email"],
-.contact-form input[type="tel"],
-.contact-form select,
-.contact-form textarea {
-  width:100%;
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #ddd;
-  font-size:1rem;
-}
-.phone-row { display:flex; gap:8px; align-items:center; }
-.phone-prefix {
-  display:inline-block;
-  padding:10px 12px;
-  border-radius:8px;
-  background:#f1f1f1;
-  border:1px solid #ddd;
-}
-
-/* form status */
-#formStatus { margin-top:8px; color:green; font-weight:600; }
-
-/* Footer */
-.site-footer {
-  background:#fff;
-  border-top:1px solid #eee;
-  padding:18px;
-  text-align:center;
-}
-
-/* ---------- DARK THEME (apply .dark-theme on body) ---------- */
-body.dark-theme {
-  background: #000;
-  color: var(--purple); /* purple fonts on dark bg */
-}
-
-body.dark-theme a { color: var(--purple); }
-body.dark-theme .navbar { background: #000; border-bottom-color: #222; }
-body.dark-theme .nav-links a { color: rgba(255,255,255,0.65); }
-body.dark-theme .nav-links a:hover, body.dark-theme .nav-links a.active { color: var(--purple); background: rgba(255,255,255,0.02); }
-
-body.dark-theme .hero { background: linear-gradient(0deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://via.placeholder.com/1600x600?text=SweetBites') center/cover no-repeat; color:#fff; }
-body.dark-theme .btn { background: var(--purple); color:#000; }
-
-body.dark-theme .card { background:#070707; border-color: #2a2a2a; }
-body.dark-theme .faq details { background: #0b0b0b; border-color: #222; }
-body.dark-theme .contact-form input, body.dark-theme .contact-form textarea, body.dark-theme .contact-form select {
-  background:#0b0b0b; border-color:#222; color:var(--purple);
-}
-body.dark-theme .phone-prefix { background:#0b0b0b; border-color:#222; color:var(--purple); }
-
-/* Small screens */
-@media (max-width:720px){
-  .nav-links { display:none; }
-  .navbar { gap:10px; }
-  .hero { padding:40px 12px; }
-  .card { width:100%; }
-}
