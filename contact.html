@@ -1,0 +1,87 @@
+<!-- contact.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SweetBites — Contact</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand"><a href="index.html">SweetBites</a></div>
+    <nav class="nav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="menu.html" class="nav-link">Menu</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="contact.html" class="nav-link active">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero hero-contact">
+      <div class="hero-inner">
+        <h1 class="hero-title">Contact & Orders</h1>
+        <p class="hero-sub">Tell us what you want — we'll reply shortly.</p>
+      </div>
+    </section>
+
+    <section class="container section-contact">
+      <form id="contactForm"
+            class="contact-form"
+            action="https://formsubmit.co/cd886137bff25171378dd37dadc1b015"
+            method="POST">
+        <!-- FormSubmit hidden items -->
+        <input type="hidden" name="_next" value="./thanks.html">
+        <input type="hidden" name="_captcha" value="false">
+        <!-- Honeypot -->
+        <input type="text" name="_honey" style="display:none">
+
+        <label>Full name <input type="text" name="name" id="name" required></label>
+
+        <label>Email <input type="email" name="email" id="email" required></label>
+
+        <label>Phone (local format: 10 digits starting with 9; +63 will be added automatically)
+          <div class="phone-row">
+            <span class="phone-prefix">+63</span>
+            <input type="tel" name="phone" id="phone" inputmode="numeric" maxlength="10" required placeholder="9123456789">
+          </div>
+        </label>
+
+        <label>Order Type
+          <select name="orderType" id="orderType" required>
+            <option value="">-- Select --</option>
+            <option>Pickup</option>
+            <option>Delivery</option>
+            <option>Custom Cake</option>
+          </select>
+        </label>
+
+        <label>Message / Order details <textarea name="message" id="message" rows="5" required></textarea></label>
+
+        <!-- Simple CAPTCHA question -->
+        <label>Type the word <strong>SWEET</strong> to confirm you're not a bot
+          <input type="text" id="captcha" required placeholder="Type SWEET">
+        </label>
+
+        <div class="form-actions">
+          <button type="submit" class="btn">Send Order</button>
+        </div>
+
+        <div id="formStatus" aria-live="polite"></div>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© 2025 SweetBites Bakery</p>
+    </div>
+  </footer>
+
+  <button id="theme-toggle" class="theme-fab" aria-label="Toggle theme"></button>
+</body>
+</html>

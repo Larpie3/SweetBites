@@ -1,0 +1,90 @@
+<!-- menu.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SweetBites — Menu</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand"><a href="index.html">SweetBites</a></div>
+    <nav class="nav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="menu.html" class="nav-link active">Menu</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="contact.html" class="nav-link">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero hero-menu">
+      <div class="hero-inner">
+        <h1 class="hero-title">Our Menu</h1>
+        <p class="hero-sub">Classic favorites and custom creations.</p>
+      </div>
+    </section>
+
+    <section class="container section-menu">
+      <div class="cards grid-3">
+        <article class="card large">
+          <img src="https://images.unsplash.com/photo-1544376664-3c8f8f0a8d67?q=80&w=1200&auto=format&fit=crop&crop=faces" alt="Chocolate Fudge Cake">
+          <div class="card-body">
+            <h3>Chocolate Fudge Cake</h3>
+            <p class="muted">8-inch chocolate cake with dark ganache.</p>
+            <p class="price">₱450</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <img src="https://images.unsplash.com/photo-1526318472351-c75fcf070d27?q=80&w=1200&auto=format&fit=crop&crop=faces" alt="Cupcakes">
+          <div class="card-body">
+            <h3>Ube Macapuno Cupcake</h3>
+            <p class="muted">Box of 6.</p>
+            <p class="price">₱420</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <img src="https://images.unsplash.com/photo-1506368249639-73a05d6f6488?q=80&w=1200&auto=format&fit=crop&crop=faces" alt="Cheesecake">
+          <div class="card-body">
+            <h3>Cheesecake Bites</h3>
+            <p class="muted">Creamy cheesecake, bite-sized.</p>
+            <p class="price">₱85</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <img src="https://images.unsplash.com/photo-1544522570-73a3d2d9d0b1?q=80&w=1200&auto=format&fit=crop&crop=faces" alt="Red Velvet">
+          <div class="card-body">
+            <h3>Red Velvet Slice</h3>
+            <p class="muted">Single slice, decadent.</p>
+            <p class="price">₱120</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop&crop=faces" alt="Macaroons">
+          <div class="card-body">
+            <h3>Macaroons (Box of 6)</h3>
+            <p class="muted">Selection of flavors.</p>
+            <p class="price">₱250</p>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© 2025 SweetBites Bakery</p>
+    </div>
+  </footer>
+
+  <button id="theme-toggle" class="theme-fab" aria-label="Toggle theme"></button>
+</body>
+</html>

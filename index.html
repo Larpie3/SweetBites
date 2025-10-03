@@ -1,0 +1,76 @@
+<!-- index.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SweetBites — Home</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand"><a href="index.html">SweetBites</a></div>
+    <nav class="nav">
+      <a href="index.html" class="nav-link active">Home</a>
+      <a href="menu.html" class="nav-link">Menu</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="contact.html" class="nav-link">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero hero-home">
+      <div class="hero-inner">
+        <h1 class="hero-title">SweetBites</h1>
+        <p class="hero-sub">Elegant cakes & artisanal pastries — handcrafted with love.</p>
+        <a class="btn" href="menu.html">View Menu</a>
+      </div>
+    </section>
+
+    <section class="container section-features">
+      <h2 class="section-title">Bestsellers</h2>
+      <div class="cards">
+        <article class="card">
+          <img src="https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop&crop=faces" alt="Chocolate Cake">
+          <div class="card-body">
+            <h3>Chocolate Fudge Cake</h3>
+            <p class="muted">Rich chocolate layers, silky ganache.</p>
+            <p class="price">₱450</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <img src="https://images.unsplash.com/photo-1542831371-d531d36971e6?q=80&w=800&auto=format&fit=crop&crop=faces" alt="Ube Cupcakes">
+          <div class="card-body">
+            <h3>Ube Macapuno Cupcake</h3>
+            <p class="muted">Light, fluffy, tropical twist.</p>
+            <p class="price">₱70</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <img src="https://images.unsplash.com/photo-1512058564366-c9e3f5b4a7d6?q=80&w=800&auto=format&fit=crop&crop=faces" alt="Red Velvet">
+          <div class="card-body">
+            <h3>Red Velvet Slice</h3>
+            <p class="muted">Cream cheese frosting, tender crumb.</p>
+            <p class="price">₱120</p>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© 2025 SweetBites Bakery — <a href="mailto:ralphcstnrs3@gmail.com">ralphcstnrs3@gmail.com</a></p>
+    </div>
+  </footer>
+
+  <button id="theme-toggle" class="theme-fab" aria-label="Toggle theme"></button>
+</body>
+</html>
