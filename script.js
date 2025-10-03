@@ -1,29 +1,24 @@
 /* script.js - SweetBites
-   - Theme toggle persists across pages using localStorage
-   - Contact form validation: phone must be 10 digits starting with 9 (local), will be prefixed with +63 before submit
-   - Simple CAPTCHA (word "SWEET") check
+   - Theme toggle persists using localStorage
+   - Try Now button scrolls to contact form
+   - Contact form validation and POST submit to FormSubmit endpoint
 */
 
 (function(){
   'use strict';
 
   /* THEME */
-  const THEME_KEY = 'sweetbites_theme_v1';
+  const THEME_KEY = 'sweetbites_theme_v2';
   const htmlEl = document.documentElement;
+  const defaultTheme = localStorage.getItem(THEME_KEY) || 'light';
 
   function applyTheme(t){
     htmlEl.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
-    // update any toggle button text if present
-    const buttons = document.querySelectorAll('#theme-toggle, .theme-fab');
-    buttons.forEach(b=>{
-      if (b) b.textContent = (t === 'dark') ? 'Light' : 'Dark';
-    });
+    const fab = document.querySelectorAll('#theme-toggle, .theme-fab');
+    fab.forEach(b => { if (b) b.textContent = (t === 'dark') ? 'Light' : 'Dark'; });
   }
+  applyTheme(defaultTheme);
 
-  const saved = localStorage.getItem(THEME_KEY) || 'light';
-  applyTheme(saved);
-
-  // toggle handler (works across pages)
   document.addEventListener('click', e=>{
     if (!e.target) return;
     if (e.target.id === 'theme-toggle' || e.target.classList.contains('theme-fab')){
@@ -33,27 +28,35 @@
     }
   });
 
-  /* CONTACT FORM VALIDATION & SUBMIT */
+  /* TRY NOW: ensure it goes to contact form when clicked on index */
+  const tryNowBtn = document.getElementById('tryNowBtn');
+  if (tryNowBtn){
+    tryNowBtn.addEventListener('click', function(e){
+      // default behavior goes to contact.html#order; no special handling needed here
+    });
+  }
+
+  /* CONTACT FORM */
   const form = document.getElementById('contactForm');
   if (!form) return;
 
   const status = document.getElementById('formStatus');
 
-  function showStatus(msg, color='crimson'){
+  function showStatus(msg, color){
     if (!status) return alert(msg);
-    status.style.color = color;
+    status.style.color = color || 'crimson';
     status.textContent = msg;
   }
 
   function isLocalPhoneValid(v){
     if (!v) return false;
     const digits = v.replace(/\D/g,'');
-    // Expect exactly 10 digits and first digit is 9 -> e.g., 9123456789
+    // expect exactly 10 digits, first digit 9 -> 9123456789
     return /^[9]\d{9}$/.test(digits);
   }
 
   form.addEventListener('submit', function(evt){
-    evt.preventDefault(); // we validate then submit programmatically
+    evt.preventDefault();
 
     const name = (form.querySelector('[name="name"]')?.value || '').trim();
     const email = (form.querySelector('[name="email"]')?.value || '').trim();
@@ -63,12 +66,9 @@
     const captcha = (form.querySelector('#captcha')?.value || '').trim();
     const honey = (form.querySelector('[name="_honey"]')?.value || '').trim();
 
-    // Honeypot: if filled, silently stop
-    if (honey) {
-      return; // bot detected
-    }
+    // honeypot check
+    if (honey) return; // likely bot
 
-    // basic presence checks
     if (!name || !email || !phoneRaw || !orderType || !message){
       showStatus('Please complete all required fields.');
       return;
@@ -84,22 +84,19 @@
       return;
     }
 
-    // prepare phone in international format: +63 + local digits
+    // convert to international +63
     const digits = phoneRaw.replace(/\D/g,'');
-    const full = '+63' + digits;
-    // set the phone input value to full (so FormSubmit receives international number)
+    const fullPhone = '+63' + digits;
     const phoneInput = form.querySelector('[name="phone"]');
-    if (phoneInput) phoneInput.value = full;
+    if (phoneInput) phoneInput.value = fullPhone;
 
-    // optimistic UI then submit
-    showStatus('Sending...', 'var(--gold-var)');
+    showStatus('Sending...', '#6b3f26');
 
-    // small delay for UX then submit
-    setTimeout(()=> {
-      form.submit(); // form.method is POST and action points to FormSubmit
-    }, 300);
+    // small delay for UX then submit (Form will POST to FormSubmit and redirect to thanks.html)
+    setTimeout(()=> form.submit(), 300);
   });
 
 })();
+
 
 
