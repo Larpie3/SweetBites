@@ -10,12 +10,12 @@
   /* THEME */
   const THEME_KEY = 'sweetbites_theme_v1';
   const htmlEl = document.documentElement;
-  const fabButtons = () => document.querySelectorAll('#theme-toggle, .theme-fab');
 
   function applyTheme(t){
     htmlEl.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
-    // update fab text/icon if present
-    fabButtons().forEach(b=>{
+    // update any toggle button text if present
+    const buttons = document.querySelectorAll('#theme-toggle, .theme-fab');
+    buttons.forEach(b=>{
       if (b) b.textContent = (t === 'dark') ? 'Light' : 'Dark';
     });
   }
@@ -23,7 +23,7 @@
   const saved = localStorage.getItem(THEME_KEY) || 'light';
   applyTheme(saved);
 
-  // toggle handler (works across pages; add button with id="theme-toggle" or class="theme-fab")
+  // toggle handler (works across pages)
   document.addEventListener('click', e=>{
     if (!e.target) return;
     if (e.target.id === 'theme-toggle' || e.target.classList.contains('theme-fab')){
@@ -33,7 +33,7 @@
     }
   });
 
-  /* CONTACT FORM VALIDATION */
+  /* CONTACT FORM VALIDATION & SUBMIT */
   const form = document.getElementById('contactForm');
   if (!form) return;
 
@@ -53,7 +53,7 @@
   }
 
   form.addEventListener('submit', function(evt){
-    evt.preventDefault();
+    evt.preventDefault(); // we validate then submit programmatically
 
     const name = (form.querySelector('[name="name"]')?.value || '').trim();
     const email = (form.querySelector('[name="email"]')?.value || '').trim();
@@ -61,6 +61,12 @@
     const orderType = (form.querySelector('[name="orderType"]')?.value || '').trim();
     const message = (form.querySelector('[name="message"]')?.value || '').trim();
     const captcha = (form.querySelector('#captcha')?.value || '').trim();
+    const honey = (form.querySelector('[name="_honey"]')?.value || '').trim();
+
+    // Honeypot: if filled, silently stop
+    if (honey) {
+      return; // bot detected
+    }
 
     // basic presence checks
     if (!name || !email || !phoneRaw || !orderType || !message){
@@ -78,21 +84,22 @@
       return;
     }
 
-    // prepare phone in international format: +63 + local digits (local digits are 10 digits starting with 9)
+    // prepare phone in international format: +63 + local digits
     const digits = phoneRaw.replace(/\D/g,'');
     const full = '+63' + digits;
-
     // set the phone input value to full (so FormSubmit receives international number)
     const phoneInput = form.querySelector('[name="phone"]');
     if (phoneInput) phoneInput.value = full;
 
     // optimistic UI then submit
-    showStatus('Sending...', 'var(--gold)');
+    showStatus('Sending...', 'var(--gold-var)');
 
-    // allow small delay for UX then submit
+    // small delay for UX then submit
     setTimeout(()=> {
-      form.submit();
+      form.submit(); // form.method is POST and action points to FormSubmit
     }, 300);
   });
 
 })();
+
+
