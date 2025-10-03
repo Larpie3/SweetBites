@@ -1,24 +1,19 @@
-# 🍰 SweetBites – Bakery Website
+# 🍰 SweetBites — Elegant Bakery Website
 
-SweetBites is a multi-page bakery website featuring a modern design with switchable light and dark themes.  
-It includes pages for **Home**, **Menu**, and **About Us (with FAQ & Policies)**, along with a **Contact Form** for customer inquiries.
-
----
-
-## 🌟 Features
-
-- ✅ Multi-page layout (Home / Menu / About Us + FAQ)
-- 🎨 Theme Switcher:  
-  - Light Mode – White with Rich Black fonts  
-  - Dark Mode – Black with Purple fonts
-- 📱 Fully Responsive (Mobile & Desktop)
-- 📬 Contact Form with:
-  - Name / Email / Phone (+63 format validation)
-  - Order Type dropdown
-  - Message box
-- 🧾 FAQ & Shop Policies section
+SweetBites is a static multi-page website for showcasing bakery products, custom cake orders, and customer inquiries.  
+It features a modern **Purple & Gold** theme, **light/dark mode**, **mobile responsiveness**, and a **fully functional order/contact form** using FormSubmit.
 
 ---
 
-## 🗂️ Project Structure
+## 📁 Project Structure
+
+```bash
+├── index.html       # Homepage
+├── menu.html        # Menu / Products page
+├── about.html       # About & FAQ page
+├── contact.html     # Order / Contact form
+├── thanks.html      # Success redirect page after form submission
+├── styles.css       # Global styles (light/dark themes included)
+├── script.js        # Theme toggle + form validation
+└── README.md        # Project documentation
 
