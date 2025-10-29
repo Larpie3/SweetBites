@@ -49,8 +49,7 @@
     return /^[9]\d{9}$/.test(digits);
   }
 
-  // Replace this with your own Google Apps Script Web App URL
-  const scriptURL = "https://script.google.com/macros/s/AKfycbx49nzX0ZPJHfx_kD7tOnL3hqkx3J9HBGxSoMhGl7wRGs7_P3Hf9vSGO7T8CcWhZGgP/exec";
+  const scriptURL = "https://script.google.com/macros/s/AKfycby2Y_FG42TS6nfue85QBEDubByrBpuyMBTmkDCCpsrUBHtpssAwTS2HdRjdoVv_DKrW/exec";
 
   form.addEventListener('submit', async function(evt){
     evt.preventDefault();
@@ -118,3 +117,4 @@
   });
 
 })();
+
