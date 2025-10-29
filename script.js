@@ -36,68 +36,59 @@
     return /^[9]\d{9}$/.test(digits);
   }
 
-  form.addEventListener('submit', async (evt) => {
-    evt.preventDefault();
+  form.addEventListener("submit", async function(evt) {
+  evt.preventDefault()
 
-    const name = form.querySelector('[name="name"]').value.trim();
-    const email = form.querySelector('[name="email"]').value.trim();
-    const phoneRaw = form.querySelector('[name="phone"]').value.trim();
-    const orderType = form.querySelector('[name="orderType"]').value.trim();
-    const message = form.querySelector('[name="message"]').value.trim();
-    const captcha = form.querySelector('#captcha').value.trim();
+  const name = form.querySelector('[name="name"]').value.trim()
+  const email = form.querySelector('[name="email"]').value.trim()
+  const phoneRaw = form.querySelector('[name="phone"]').value.trim()
+  const orderType = form.querySelector('[name="orderType"]').value.trim()
+  const message = form.querySelector('[name="message"]').value.trim()
+  const captcha = form.querySelector('#captcha').value.trim()
 
-    if (!name || !email || !phoneRaw || !orderType || !message) {
-      showStatus('Please complete all required fields.');
-      return;
+  if (!name || !email || !phoneRaw || !orderType || !message) {
+    showStatus("Please complete all required fields.")
+    return
+  }
+
+  if (!isLocalPhoneValid(phoneRaw)) {
+    showStatus("Phone must be 10 digits and start with 9 (e.g. 9123456789).")
+    return
+  }
+
+  if (captcha.toUpperCase() !== "SWEET") {
+    showStatus("Captcha word is incorrect.")
+    return
+  }
+
+  const digits = phoneRaw.replace(/\D/g, "")
+  const fullPhone = "+63" + digits
+
+  const payload = {
+    name,
+    email,
+    phone: fullPhone,
+    orderType,
+    message
+  }
+
+  showStatus("⏳ Sending your order...", "goldenrod")
+
+  try {
+    const response = await fetch("https://sweetbites-server.onrender.com/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+
+    const result = await response.json()
+    if (result.success) {
+      showStatus("✅ Order sent successfully!", "green")
+      setTimeout(() => window.location.href = "thanks.html", 800)
+    } else {
+      showStatus("⚠️ There was an error sending your order. Please try again.")
     }
-
-    if (!isLocalPhoneValid(phoneRaw)) {
-      showStatus('Phone must be 10 digits and start with 9 (e.g. 9123456789).');
-      return;
-    }
-
-    if (captcha.toUpperCase() !== 'SWEET') {
-      showStatus('Captcha word is incorrect.');
-      return;
-    }
-
-    const fullPhone = '+63' + phoneRaw.replace(/\D/g, '');
-
-    const formData = {
-      name,
-      email,
-      phone: fullPhone,
-      orderType,
-      message,
-      timestamp: new Date().toLocaleString(),
-    };
-
-    try {
-      showStatus('⏳ Sending order...');
-      const res = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          access_key: 'f4a0d85e-a43d-4074-8220-5c4c74d09726',
-          ...formData,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!data.success) throw new Error('Web3Forms failed.');
-      fetch('https://sweetbites-server.onrender.com/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      }).catch((err) => console.warn('Backup failed:', err));
-
-      showStatus('✅ Order sent! Redirecting...', 'green');
-      setTimeout(() => (window.location.href = 'thanks.html'), 1200);
-    } catch (err) {
-      console.error('Error sending form:', err);
-      showStatus('⚠️ There was an error sending your order. Please try again.');
-    }
-  });
-})();
-
+  } catch (err) {
+    showStatus("⚠️ Error sending order. Please check your connection or try again later.")
+  }
+})
