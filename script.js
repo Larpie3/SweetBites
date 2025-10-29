@@ -61,29 +61,34 @@
     const formData = new FormData(form);
     formData.set('phone', fullPhone);
 
+    let web3Success = false;
     try {
-      await fetch('https://api.web3forms.com/submit', {
+      const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         body: new URLSearchParams(formData)
       });
+      if(res.ok) web3Success = true;
     } catch(err){
       console.error('Web3Forms error:', err);
     }
 
-    const backupData = {
-      name, email, phone: fullPhone, orderType, message
-    };
-
+    const backupData = { name, email, phone: fullPhone, orderType, message };
+    let googleSuccess = false;
     try {
-      await fetch('https://sweetbites-server.onrender.com/submit', {
+      const res = await fetch('https://sweetbites-server.onrender.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(backupData)
       });
-      window.location.href = "thanks.html";
+      if(res.ok) googleSuccess = true;
     } catch(err){
-      showStatus('⚠️ There was an error sending your order. Please try again.');
       console.error('Google backup error:', err);
+    }
+
+    if(web3Success || googleSuccess){
+      window.location.href = "thanks.html";
+    } else {
+      showStatus('⚠️ There was an error sending your order. Please try again.');
     }
   });
 })();
