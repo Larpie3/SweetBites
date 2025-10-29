@@ -6,7 +6,7 @@ function showStatus(message, color = "red") {
   statusBox.style.color = color;
 }
 
-form.addEventListener("submit", async (e) => {
+document.addEventListener("DOMContentLoaded", () => {
   e.preventDefault();
   const name = document.getElementById("name").value.trim();
   const email = document.getElementById("email").value.trim();
@@ -68,3 +68,4 @@ form.addEventListener("submit", async (e) => {
     showStatus("⚠️ Error sending order. Please try again.");
   }
 });
+
