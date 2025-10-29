@@ -1,72 +1,89 @@
-const form = document.getElementById("contactForm");
-const statusBox = document.getElementById("formStatus");
+(function(){
+  const form = document.getElementById('contactForm');
+  const status = document.getElementById('formStatus');
+  if(!form) return;
 
-function showStatus(message, color = "red") {
-  statusBox.textContent = message;
-  statusBox.style.color = color;
-}
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const name = document.getElementById("name").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const phoneInput = document.getElementById("phone").value.trim();
-  const orderType = document.getElementById("orderType").value.trim();
-  const message = document.getElementById("message").value.trim();
-  const captcha = document.getElementById("captcha").value.trim();
-
-  if (!name || !email || !phoneInput || !orderType || !message) {
-    showStatus("⚠️ Please fill out all fields.");
-    return;
-  }
-
-  if (!/^9\d{9}$/.test(phoneInput)) {
-    showStatus("⚠️ Phone must start with 9 and be 10 digits.");
-    return;
-  }
-
-  if (captcha.toUpperCase() !== "SWEET") {
-    showStatus("⚠️ Wrong captcha word.");
-    return;
-  }
-
-  const phone = "+63" + phoneInput;
-  const data = {
-    access_key: "f4a0d85e-a43d-4074-8220-5c4c74d09726",
-    name,
-    email,
-    phone,
-    orderType,
-    message,
-  };
-
-  showStatus("⏳ Sending your order...", "goldenrod");
-
-  try {
-    const web3 = await fetch("https://api.web3forms.com/submit", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    const web3Res = await web3.json();
-
-    const google = await fetch("https://sweetbites-server.onrender.com/submit", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, phone, orderType, message }),
-    });
-
-    if (web3Res.success && google.ok) {
-      showStatus("✅ Order sent successfully!", "green");
-      setTimeout(() => {
-        window.location.href = "thanks.html";
-      }, 1000);
-    } else {
-      showStatus("⚠️ There was an error sending your order.");
+  const THEME_KEY = 'sweetbites_theme_v2';
+  const htmlEl = document.documentElement;
+  const themeBtn = document.querySelector('#theme-toggle');
+  const defaultTheme = localStorage.getItem(THEME_KEY) || 'light';
+  htmlEl.setAttribute('data-theme', defaultTheme);
+  if(themeBtn) themeBtn.textContent = defaultTheme === 'dark' ? 'Light' : 'Dark';
+  document.addEventListener('click', e => {
+    if(!e.target) return;
+    if(e.target.id === 'theme-toggle' || e.target.classList.contains('theme-fab')){
+      const next = htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      htmlEl.setAttribute('data-theme', next);
+      if(themeBtn) themeBtn.textContent = next === 'dark' ? 'Light' : 'Dark';
+      localStorage.setItem(THEME_KEY, next);
     }
-  } catch (err) {
-    showStatus("⚠️ Error sending order. Please try again.");
+  });
+
+  function showStatus(msg, color){
+    if(!status) return alert(msg);
+    status.style.color = color || 'crimson';
+    status.textContent = msg;
   }
-});
 
+  function isLocalPhoneValid(v){
+    if(!v) return false;
+    const digits = v.replace(/\D/g,'');
+    return /^[9]\d{9}$/.test(digits);
+  }
 
+  form.addEventListener('submit', async function(evt){
+    evt.preventDefault();
+    const name = (form.querySelector('[name="name"]')?.value || '').trim();
+    const email = (form.querySelector('[name="email"]')?.value || '').trim();
+    const phoneRaw = (form.querySelector('[name="phone"]')?.value || '').trim();
+    const orderType = (form.querySelector('[name="orderType"]')?.value || '').trim();
+    const message = (form.querySelector('[name="message"]')?.value || '').trim();
+    const captcha = (form.querySelector('#captcha')?.value || '').trim();
+
+    if(!name || !email || !phoneRaw || !orderType || !message){
+      showStatus('Please complete all required fields.');
+      return;
+    }
+
+    if(!isLocalPhoneValid(phoneRaw)){
+      showStatus('Phone must be 10 digits and start with 9 (e.g. 9123456789).');
+      return;
+    }
+
+    if(captcha.toUpperCase() !== 'SWEET'){
+      showStatus('Captcha word is incorrect.');
+      return;
+    }
+
+    const digits = phoneRaw.replace(/\D/g,'');
+    const fullPhone = '+63' + digits;
+
+    const formData = new FormData(form);
+    formData.set('phone', fullPhone);
+
+    try {
+      await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: new URLSearchParams(formData)
+      });
+    } catch(err){
+      console.error('Web3Forms error:', err);
+    }
+
+    const backupData = {
+      name, email, phone: fullPhone, orderType, message
+    };
+
+    try {
+      await fetch('https://sweetbites-server.onrender.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(backupData)
+      });
+      window.location.href = "thanks.html";
+    } catch(err){
+      showStatus('⚠️ There was an error sending your order. Please try again.');
+      console.error('Google backup error:', err);
+    }
+  });
+})();
