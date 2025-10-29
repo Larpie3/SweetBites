@@ -48,17 +48,14 @@
     formData.append('message', message);
     formData.append('access_key', form.querySelector('[name="access_key"]').value);
 
-    showStatus('Sending your order...', 'blue');
+    showStatus('⏳ Sending your order...', 'blue');
 
     try {
-      // Send to Web3Forms
       const web3Response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         body: formData
       });
       if (!web3Response.ok) throw new Error('Failed to send order to Web3Forms');
-
-      // Send to Proxy/Google Sheet
       const proxyResponse = await fetch('https://sweetbites-server.onrender.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -66,7 +63,7 @@
       });
       if (!proxyResponse.ok) throw new Error('Failed to send order to backup Google Sheet');
 
-      showStatus('Order sent successfully!', 'green');
+      showStatus('✅ Order sent successfully!', 'green');
       form.reset();
       setTimeout(() => {
         window.location.href = 'thanks.html';
@@ -78,3 +75,4 @@
     }
   });
 })();
+
