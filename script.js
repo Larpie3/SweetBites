@@ -7,7 +7,6 @@
   const htmlEl = document.documentElement;
   const themeBtn = document.querySelector('#theme-toggle');
 
-  // ===== Theme Toggle =====
   function applyTheme(t) {
     htmlEl.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
     if (themeBtn) themeBtn.textContent = t === 'dark' ? 'Light' : 'Dark';
@@ -37,7 +36,6 @@
     return /^[9]\d{9}$/.test(digits);
   }
 
-  // ===== Handle Form Submit =====
   form.addEventListener('submit', async (evt) => {
     evt.preventDefault();
 
@@ -75,7 +73,6 @@
     };
 
     try {
-      // 1️⃣ Send to Web3Forms
       showStatus('⏳ Sending order...');
       const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
@@ -89,15 +86,12 @@
       const data = await res.json();
 
       if (!data.success) throw new Error('Web3Forms failed.');
-
-      // 2️⃣ Send backup to Google Apps Script via your proxy
       fetch('https://sweetbites-server.onrender.com/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       }).catch((err) => console.warn('Backup failed:', err));
 
-      // ✅ Success → redirect
       showStatus('✅ Order sent! Redirecting...', 'green');
       setTimeout(() => (window.location.href = 'thanks.html'), 1200);
     } catch (err) {
@@ -106,3 +100,4 @@
     }
   });
 })();
+
