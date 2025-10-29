@@ -1,94 +1,70 @@
-(function () {
-  'use strict';
+const form = document.getElementById("contactForm");
+const statusBox = document.getElementById("formStatus");
 
-  const form = document.getElementById('contactForm');
-  const status = document.getElementById('formStatus');
-  const THEME_KEY = 'sweetbites_theme_v2';
-  const htmlEl = document.documentElement;
-  const themeBtn = document.querySelector('#theme-toggle');
+function showStatus(message, color = "red") {
+  statusBox.textContent = message;
+  statusBox.style.color = color;
+}
 
-  function applyTheme(t) {
-    htmlEl.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
-    if (themeBtn) themeBtn.textContent = t === 'dark' ? 'Light' : 'Dark';
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const phoneInput = document.getElementById("phone").value.trim();
+  const orderType = document.getElementById("orderType").value.trim();
+  const message = document.getElementById("message").value.trim();
+  const captcha = document.getElementById("captcha").value.trim();
+
+  if (!name || !email || !phoneInput || !orderType || !message) {
+    showStatus("⚠️ Please fill out all fields.");
+    return;
   }
 
-  applyTheme(localStorage.getItem(THEME_KEY) || 'light');
-
-  document.addEventListener('click', (e) => {
-    if (e.target.id === 'theme-toggle' || e.target.classList.contains('theme-fab')) {
-      const next = htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      applyTheme(next);
-      localStorage.setItem(THEME_KEY, next);
-    }
-  });
-
-  if (!form) return;
-
-  function showStatus(msg, color) {
-    if (!status) return alert(msg);
-    status.style.color = color || 'crimson';
-    status.textContent = msg;
-  }
-
-  function isLocalPhoneValid(v) {
-    if (!v) return false;
-    const digits = v.replace(/\D/g, '');
-    return /^[9]\d{9}$/.test(digits);
-  }
-
-  form.addEventListener("submit", async function(evt) {
-  evt.preventDefault()
-
-  const name = form.querySelector('[name="name"]').value.trim()
-  const email = form.querySelector('[name="email"]').value.trim()
-  const phoneRaw = form.querySelector('[name="phone"]').value.trim()
-  const orderType = form.querySelector('[name="orderType"]').value.trim()
-  const message = form.querySelector('[name="message"]').value.trim()
-  const captcha = form.querySelector('#captcha').value.trim()
-
-  if (!name || !email || !phoneRaw || !orderType || !message) {
-    showStatus("Please complete all required fields.")
-    return
-  }
-
-  if (!isLocalPhoneValid(phoneRaw)) {
-    showStatus("Phone must be 10 digits and start with 9 (e.g. 9123456789).")
-    return
+  if (!/^9\d{9}$/.test(phoneInput)) {
+    showStatus("⚠️ Phone must start with 9 and be 10 digits.");
+    return;
   }
 
   if (captcha.toUpperCase() !== "SWEET") {
-    showStatus("Captcha word is incorrect.")
-    return
+    showStatus("⚠️ Wrong captcha word.");
+    return;
   }
 
-  const digits = phoneRaw.replace(/\D/g, "")
-  const fullPhone = "+63" + digits
-
-  const payload = {
+  const phone = "+63" + phoneInput;
+  const data = {
+    access_key: "f4a0d85e-a43d-4074-8220-5c4c74d09726",
     name,
     email,
-    phone: fullPhone,
+    phone,
     orderType,
-    message
-  }
+    message,
+  };
 
-  showStatus("⏳ Sending your order...", "goldenrod")
+  showStatus("⏳ Sending your order...", "goldenrod");
 
   try {
-    const response = await fetch("https://sweetbites-server.onrender.com/submit", {
+    const web3 = await fetch("https://api.web3forms.com/submit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    })
+      body: JSON.stringify(data),
+    });
+    const web3Res = await web3.json();
 
-    const result = await response.json()
-    if (result.success) {
-      showStatus("✅ Order sent successfully!", "green")
-      setTimeout(() => window.location.href = "thanks.html", 800)
+    const google = await fetch("https://sweetbites-server.onrender.com/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, phone, orderType, message }),
+    });
+
+    if (web3Res.success && google.ok) {
+      showStatus("✅ Order sent successfully!", "green");
+      setTimeout(() => {
+        window.location.href = "thanks.html";
+      }, 1000);
     } else {
-      showStatus("⚠️ There was an error sending your order. Please try again.")
+      showStatus("⚠️ There was an error sending your order.");
     }
   } catch (err) {
-    showStatus("⚠️ Error sending order. Please check your connection or try again later.")
+    showStatus("⚠️ Error sending order. Please try again.");
   }
-})
+});
