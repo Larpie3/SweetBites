@@ -1,6 +1,7 @@
 (function(){
   'use strict';
 
+  // ====== NAV MENU ======
   const menuToggle = document.querySelector('.mobile-menu-toggle');
   const nav = document.querySelector('.nav');
   
@@ -12,6 +13,7 @@
     });
   }
 
+  // ====== THEME TOGGLE ======
   const THEME_KEY = 'sweetbites_theme_v2';
   const htmlEl = document.documentElement;
   const defaultTheme = localStorage.getItem(THEME_KEY) || 'light';
@@ -33,6 +35,7 @@
     }
   });
 
+  // ====== FORM HANDLING ======
   const form = document.getElementById('contactForm');
   if(!form) return;
   const status = document.getElementById('formStatus');
@@ -48,8 +51,6 @@
     const digits = v.replace(/\D/g,'');
     return /^[9]\d{9}$/.test(digits);
   }
-
-  const scriptURL = "https://script.google.com/macros/s/AKfycby2Y_FG42TS6nfue85QBEDubByrBpuyMBTmkDCCpsrUBHtpssAwTS2HdRjdoVv_DKrW/exec";
 
   form.addEventListener('submit', async function(evt){
     evt.preventDefault();
@@ -78,43 +79,44 @@
 
     const digits = phoneRaw.replace(/\D/g,'');
     const fullPhone = '+63' + digits;
-    const phoneInput = form.querySelector('[name="phone"]');
-    if(phoneInput) phoneInput.value = fullPhone;
 
-    showStatus('Sending your order...', 'gray');
+    const data = {
+      access_key: "f4a0d85e-a43d-4074-8220-5c4c74d09726",
+      name,
+      email,
+      phone: fullPhone,
+      orderType,
+      message
+    };
 
-    const formData = new FormData(form);
-    const json = Object.fromEntries(formData.entries());
+    showStatus('⏳ Sending your order...', '#555');
 
     try {
-      const web3Response = await fetch(form.action, {
-        method: 'POST',
-        body: formData
+      // ✅ Using your Render proxy
+      const response = await fetch("https://sweetbites-server.onrender.com", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
       });
 
-      const web3Data = await web3Response.json();
-      console.log("Web3Forms response:", web3Data);
+      const result = await response.json();
 
-      const sheetResponse = await fetch(scriptURL, {
-        method: 'POST',
-        body: JSON.stringify(json),
-        headers: { 'Content-Type': 'application/json' }
-      });
+      if(response.ok && result.success){
+        showStatus('✅ Order sent successfully! Redirecting...', 'green');
+        setTimeout(() => {
+          window.location.href = "thanks.html";
+        }, 1500);
+      } else {
+        console.error("Response error:", result);
+        showStatus('⚠️ There was an error sending your order. Please try again.', 'crimson');
+      }
 
-      const sheetData = await sheetResponse.json();
-      console.log("Google Sheets response:", sheetData);
-
-      showStatus('✅ Order sent successfully!', 'green');
-      form.reset();
-      setTimeout(() => {
-        window.location.href = "thanks.html";
-      }, 800);
-
-    } catch (error) {
-      console.error("Error sending form:", error);
-      showStatus('⚠️ There was an error sending your order. Please try again.', 'crimson');
+    } catch(err){
+      console.error('Error sending form:', err);
+      showStatus('⚠️ Network error. Please try again later.', 'crimson');
     }
   });
 
 })();
-
