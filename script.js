@@ -1,93 +1,79 @@
-(function(){
+(function() {
   const form = document.getElementById('contactForm');
   const status = document.getElementById('formStatus');
-  if(!form) return;
 
-  const THEME_KEY = 'sweetbites_theme_v2';
-  const htmlEl = document.documentElement;
-  const themeBtn = document.querySelector('#theme-toggle');
-  const defaultTheme = localStorage.getItem(THEME_KEY) || 'light';
-  htmlEl.setAttribute('data-theme', defaultTheme);
-  if(themeBtn) themeBtn.textContent = defaultTheme === 'dark' ? 'Light' : 'Dark';
-  document.addEventListener('click', e => {
-    if(!e.target) return;
-    if(e.target.id === 'theme-toggle' || e.target.classList.contains('theme-fab')){
-      const next = htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      htmlEl.setAttribute('data-theme', next);
-      if(themeBtn) themeBtn.textContent = next === 'dark' ? 'Light' : 'Dark';
-      localStorage.setItem(THEME_KEY, next);
-    }
-  });
-
-  function showStatus(msg, color){
-    if(!status) return alert(msg);
-    status.style.color = color || 'crimson';
+  function showStatus(msg, color = 'crimson') {
+    if (!status) return alert(msg);
+    status.style.color = color;
     status.textContent = msg;
   }
 
-  function isLocalPhoneValid(v){
-    if(!v) return false;
-    const digits = v.replace(/\D/g,'');
+  function isLocalPhoneValid(v) {
+    if (!v) return false;
+    const digits = v.replace(/\D/g, '');
     return /^[9]\d{9}$/.test(digits);
   }
 
-  form.addEventListener('submit', async function(evt){
-    evt.preventDefault();
-    const name = (form.querySelector('[name="name"]')?.value || '').trim();
-    const email = (form.querySelector('[name="email"]')?.value || '').trim();
-    const phoneRaw = (form.querySelector('[name="phone"]')?.value || '').trim();
-    const orderType = (form.querySelector('[name="orderType"]')?.value || '').trim();
-    const message = (form.querySelector('[name="message"]')?.value || '').trim();
-    const captcha = (form.querySelector('#captcha')?.value || '').trim();
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-    if(!name || !email || !phoneRaw || !orderType || !message){
+    const name = (form.querySelector('[name="name"]').value || '').trim();
+    const email = (form.querySelector('[name="email"]').value || '').trim();
+    const phoneRaw = (form.querySelector('[name="phone"]').value || '').trim();
+    const orderType = (form.querySelector('[name="orderType"]').value || '').trim();
+    const message = (form.querySelector('[name="message"]').value || '').trim();
+    const captcha = (form.querySelector('#captcha').value || '').trim();
+
+    if (!name || !email || !phoneRaw || !orderType || !message) {
       showStatus('Please complete all required fields.');
       return;
     }
 
-    if(!isLocalPhoneValid(phoneRaw)){
-      showStatus('Phone must be 10 digits and start with 9 (e.g. 9123456789).');
+    if (!isLocalPhoneValid(phoneRaw)) {
+      showStatus('Phone must be 10 digits and start with 9 (e.g., 9123456789).');
       return;
     }
 
-    if(captcha.toUpperCase() !== 'SWEET'){
+    if (captcha.toUpperCase() !== 'SWEET') {
       showStatus('Captcha word is incorrect.');
       return;
     }
 
-    const digits = phoneRaw.replace(/\D/g,'');
-    const fullPhone = '+63' + digits;
+    const fullPhone = '+63' + phoneRaw.replace(/\D/g, '');
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('phone', fullPhone);
+    formData.append('orderType', orderType);
+    formData.append('message', message);
+    formData.append('access_key', form.querySelector('[name="access_key"]').value);
 
-    const formData = new FormData(form);
-    formData.set('phone', fullPhone);
+    showStatus('Sending your order...', 'blue');
 
-    let web3Success = false;
     try {
-      const res = await fetch('https://api.web3forms.com/submit', {
+      // Send to Web3Forms
+      const web3Response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        body: new URLSearchParams(formData)
+        body: formData
       });
-      if(res.ok) web3Success = true;
-    } catch(err){
-      console.error('Web3Forms error:', err);
-    }
+      if (!web3Response.ok) throw new Error('Failed to send order to Web3Forms');
 
-    const backupData = { name, email, phone: fullPhone, orderType, message };
-    let googleSuccess = false;
-    try {
-      const res = await fetch('https://sweetbites-server.onrender.com/submit', {
+      // Send to Proxy/Google Sheet
+      const proxyResponse = await fetch('https://sweetbites-server.onrender.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(backupData)
+        body: JSON.stringify({ name, email, phone: fullPhone, orderType, message })
       });
-      if(res.ok) googleSuccess = true;
-    } catch(err){
-      console.error('Google backup error:', err);
-    }
+      if (!proxyResponse.ok) throw new Error('Failed to send order to backup Google Sheet');
 
-    if(web3Success || googleSuccess){
-      window.location.href = "thanks.html";
-    } else {
+      showStatus('Order sent successfully!', 'green');
+      form.reset();
+      setTimeout(() => {
+        window.location.href = 'thanks.html';
+      }, 1500);
+
+    } catch (err) {
+      console.error(err);
       showStatus('⚠️ There was an error sending your order. Please try again.');
     }
   });
