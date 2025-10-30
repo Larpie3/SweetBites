@@ -1,74 +1,85 @@
-(function () {
-  const form = document.getElementById('contactForm');
-  const status = document.getElementById('formStatus');
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-  function showStatus(msg, color = 'crimson') {
-    if (!status) return alert(msg);
-    status.style.color = color;
-    status.textContent = msg;
-  }
+const firebaseConfig = {
+  apiKey: "AIzaSyBcg8n-7trSSe2fvvPE0dOocnNG1x5fZ7s",
+  authDomain: "sweetbites-admin-console.firebaseapp.com",
+  projectId: "sweetbites-admin-console",
+  storageBucket: "sweetbites-admin-console.firebasestorage.app",
+  messagingSenderId: "125142981711",
+  appId: "1:125142981711:web:7ad785732b705597069e3a"
+};
 
-  if (!form) return;
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+document.addEventListener("DOMContentLoaded", () => {
+  const contactForm = document.getElementById("contactForm");
+  const formStatus = document.getElementById("formStatus");
+  const themeToggle = document.getElementById("theme-toggle");
 
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
-    const phone = '+63' + (data.phone || '').replace(/\D/g, '');
+  // Smooth fade-up animations
+  const fadeUps = document.querySelectorAll(".fade-up");
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add("visible");
+    });
+  }, { threshold: 0.2 });
+  fadeUps.forEach(el => observer.observe(el));
 
-    if (!data.name || !data.email || !data.phone || !data.address || !data.orderType) {
-      return showStatus('Please complete all required fields.');
-    }
-
-    if (data.captcha?.toUpperCase() !== 'SWEET') {
-      return showStatus('Captcha incorrect.');
-    }
-
-    showStatus('⏳ Sending your order...', 'blue');
-
-    try {
-      const proxyRes = await fetch('https://sweetbites-server.onrender.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, phone })
-      });
-
-      const resJson = await proxyRes.json();
-      if (!resJson.success) throw new Error(resJson.message);
-
-      await saveToFirebase({ ...data, phone });
-
-      showStatus('✅ Order sent successfully!', 'green');
-      form.reset();
-
-      setTimeout(() => (window.location.href = 'thanks.html'), 1200);
-    } catch (err) {
-      console.error(err);
-      showStatus('⚠️ Error sending order. Please try again.');
-    }
+  // Theme toggle
+  themeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark-theme");
+    themeToggle.textContent = document.body.classList.contains("dark-theme") ? "Light" : "Dark";
   });
 
-  async function saveToFirebase(data) {
-    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js');
-    const { getFirestore, addDoc, collection, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js');
+  // Form submission handler
+  contactForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    formStatus.textContent = "Sending...";
+    formStatus.className = "";
 
-    const firebaseConfig = {
-      apiKey: 'AIzaSyCkxYnwFBOTO_vz6bkJJWM1tSatq4H6yeY',
-      authDomain: 'sweetbites-admin-console.firebaseapp.com',
-      projectId: 'sweetbites-admin-console',
-      storageBucket: 'sweetbites-admin-console.firebasestorage.app',
-      messagingSenderId: '125142981711',
-      appId: '1:125142981711:web:7ad785732b705597069e3a'
-    };
+    const name = contactForm.name.value.trim();
+    const email = contactForm.email.value.trim();
+    const phone = "+63" + contactForm.phone.value.trim();
+    const orderType = contactForm.orderType.value.trim();
+    const message = contactForm.message.value.trim();
+    const captcha = contactForm.captcha.value.trim().toUpperCase();
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    if (captcha !== "SWEET") {
+      formStatus.textContent = "Captcha failed. Please type SWEET.";
+      formStatus.classList.add("error");
+      return;
+    }
 
-    await addDoc(collection(db, 'orders'), {
-      ...data,
-      timestamp: serverTimestamp(),
-      status: 'Pending'
-    });
-  }
-})();
+    try {
+      // Send to Firebase
+      await addDoc(collection(db, "orders"), {
+        name,
+        email,
+        phone,
+        orderType,
+        message,
+        status: "Pending",
+        timestamp: new Date().toISOString(),
+      });
+
+      // Send to Web3Forms (for email notification)
+      const formData = new FormData(contactForm);
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData
+      });
+
+      if (!response.ok) throw new Error("Web3Forms error");
+
+      formStatus.textContent = "Order sent successfully!";
+      formStatus.classList.add("success");
+      contactForm.reset();
+    } catch (err) {
+      console.error(err);
+      formStatus.textContent = "Failed to send. Please try again.";
+      formStatus.classList.add("error");
+    }
+  });
+});
