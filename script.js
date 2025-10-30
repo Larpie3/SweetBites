@@ -1,85 +1,173 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+(function () {
+  const THEME_KEY = 'sweetbites_theme_v2';
+  const root = document.documentElement;
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBcg8n-7trSSe2fvvPE0dOocnNG1x5fZ7s",
-  authDomain: "sweetbites-admin-console.firebaseapp.com",
-  projectId: "sweetbites-admin-console",
-  storageBucket: "sweetbites-admin-console.firebasestorage.app",
-  messagingSenderId: "125142981711",
-  appId: "1:125142981711:web:7ad785732b705597069e3a"
-};
+  function applyTheme(t) {
+    if (t === 'dark') {
+      root.setAttribute('data-theme', 'dark');
+    } else {
+      root.setAttribute('data-theme', 'light');
+    }
+    const btn = document.getElementById('theme-toggle');
+    if (btn) btn.textContent = t === 'dark' ? 'Light' : 'Dark';
+  }
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+  const saved = localStorage.getItem(THEME_KEY) || 'dark';
+  applyTheme(saved);
 
-document.addEventListener("DOMContentLoaded", () => {
-  const contactForm = document.getElementById("contactForm");
-  const formStatus = document.getElementById("formStatus");
-  const themeToggle = document.getElementById("theme-toggle");
-
-  // Smooth fade-up animations
-  const fadeUps = document.querySelectorAll(".fade-up");
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) entry.target.classList.add("visible");
-    });
-  }, { threshold: 0.2 });
-  fadeUps.forEach(el => observer.observe(el));
-
-  // Theme toggle
-  themeToggle.addEventListener("click", () => {
-    document.body.classList.toggle("dark-theme");
-    themeToggle.textContent = document.body.classList.contains("dark-theme") ? "Light" : "Dark";
+  document.addEventListener('click', function (e) {
+    if (!e.target) return;
+    if (e.target.id === 'theme-toggle' || e.target.classList.contains('theme-fab')) {
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      localStorage.setItem(THEME_KEY, next);
+    }
   });
 
-  // Form submission handler
-  contactForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    formStatus.textContent = "Sending...";
-    formStatus.className = "";
-
-    const name = contactForm.name.value.trim();
-    const email = contactForm.email.value.trim();
-    const phone = "+63" + contactForm.phone.value.trim();
-    const orderType = contactForm.orderType.value.trim();
-    const message = contactForm.message.value.trim();
-    const captcha = contactForm.captcha.value.trim().toUpperCase();
-
-    if (captcha !== "SWEET") {
-      formStatus.textContent = "Captcha failed. Please type SWEET.";
-      formStatus.classList.add("error");
-      return;
+  document.addEventListener('DOMContentLoaded', function () {
+    // IntersectionObserver for fade-up / reveal animations
+    const elems = document.querySelectorAll('.fade-up, .reveal');
+    if (elems.length) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+      }, { threshold: 0.12 });
+      elems.forEach(el => io.observe(el));
     }
 
-    try {
-      // Send to Firebase
-      await addDoc(collection(db, "orders"), {
+    // Mobile nav toggle if present
+    const menuToggle = document.querySelector('.mobile-menu-toggle');
+    const nav = document.querySelector('.nav');
+    if (menuToggle && nav) {
+      menuToggle.addEventListener('click', () => {
+        nav.classList.toggle('active');
+        menuToggle.setAttribute('aria-expanded', nav.classList.contains('active'));
+      });
+    }
+
+    const form = document.getElementById('contactForm');
+    const status = document.getElementById('formStatus');
+
+    function showStatus(msg, color) {
+      if (!status) return alert(msg);
+      status.style.color = color || 'crimson';
+      status.textContent = msg;
+    }
+
+    function isLocalPhoneValid(v) {
+      if (!v) return false;
+      const digits = v.replace(/\D/g, '');
+      return /^[9]\d{9}$/.test(digits);
+    }
+
+    if (!form) return;
+
+    form.addEventListener('submit', async function (evt) {
+      evt.preventDefault();
+
+      const fd = new FormData(form);
+      const name = (fd.get('name') || '').trim();
+      const email = (fd.get('email') || '').trim();
+      const phoneRaw = (fd.get('phone') || '').trim();
+      const orderType = (fd.get('orderType') || '').trim();
+      const address = (fd.get('address') || '').trim();
+      const flavor = (fd.get('flavor') || '').trim();
+      const size = (fd.get('size') || '').trim();
+      const notes = (fd.get('notes') || '').trim();
+      const message = (fd.get('message') || '').trim();
+      const captcha = (fd.get('captcha') || '').trim();
+      const access_key = (fd.get('access_key') || '').trim();
+
+      if (!name || !email || !phoneRaw || !orderType) {
+        showStatus('Please complete all required fields.');
+        return;
+      }
+
+      if (!isLocalPhoneValid(phoneRaw)) {
+        showStatus('Phone must be 10 digits and start with 9 (e.g., 9123456789).');
+        return;
+      }
+
+      if (captcha.toUpperCase() !== 'SWEET') {
+        showStatus('Captcha word is incorrect.');
+        return;
+      }
+
+      const fullPhone = '+63' + phoneRaw.replace(/\D/g, '');
+      const payload = {
+        access_key,
         name,
         email,
-        phone,
+        phone: fullPhone,
         orderType,
-        message,
-        status: "Pending",
-        timestamp: new Date().toISOString(),
-      });
+        address,
+        flavor,
+        size,
+        notes,
+        message
+      };
 
-      // Send to Web3Forms (for email notification)
-      const formData = new FormData(contactForm);
-      const response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        body: formData
-      });
+      showStatus('⏳ Sending your order...', 'blue');
 
-      if (!response.ok) throw new Error("Web3Forms error");
+      try {
+        const proxyUrl = 'https://sweetbites-server.onrender.com/submit';
+        const proxyRes = await fetch(proxyUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
 
-      formStatus.textContent = "Order sent successfully!";
-      formStatus.classList.add("success");
-      contactForm.reset();
-    } catch (err) {
-      console.error(err);
-      formStatus.textContent = "Failed to send. Please try again.";
-      formStatus.classList.add("error");
+        if (!proxyRes.ok) {
+          const txt = await proxyRes.text().catch(() => '');
+          throw new Error('Proxy error: ' + (txt || proxyRes.status));
+        }
+
+        const proxyJson = await proxyRes.json().catch(() => ({}));
+        if (proxyJson.success === false) {
+          throw new Error(proxyJson.message || 'Proxy indicated failure');
+        }
+
+        await saveToFirebase({ ...payload, phone: fullPhone });
+
+        showStatus('✅ Order sent successfully!', 'green');
+        form.reset();
+        setTimeout(() => {
+          window.location.href = 'thanks.html';
+        }, 1200);
+
+      } catch (err) {
+        console.error('Order submit error:', err);
+        showStatus('⚠️ There was an error sending your order. Please try again.');
+      }
+    });
+
+    async function saveToFirebase(data) {
+      try {
+        const modApp = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js');
+        const modFs = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js');
+
+        const firebaseConfig = {
+          apiKey: 'AIzaSyCkxYnwFBOTO_vz6bkJJWM1tSatq4H6yeY',
+          authDomain: 'sweetbites-admin-console.firebaseapp.com',
+          projectId: 'sweetbites-admin-console',
+          storageBucket: 'sweetbites-admin-console.firebasestorage.app',
+          messagingSenderId: '125142981711',
+          appId: '1:125142981711:web:7ad785732b705597069e3a'
+        };
+
+        const app = modApp.initializeApp(firebaseConfig);
+        const db = modFs.getFirestore(app);
+        const { addDoc, collection, serverTimestamp } = modFs;
+
+        await addDoc(collection(db, 'orders'), {
+          ...data,
+          timestamp: serverTimestamp(),
+          status: 'Pending'
+        });
+      } catch (err) {
+        console.error('Firebase save failed:', err);
+      }
     }
   });
-});
+})();
