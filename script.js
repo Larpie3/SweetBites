@@ -47,19 +47,6 @@
     showStatus('⏳ Sending your order...', 'blue');
 
     try {
-      const web3Response = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        body: formData,
-      });
-      if (!web3Response.ok) throw new Error('Web3Forms submission failed.');
-
-      const proxyResponse = await fetch('https://sweetbites-server.onrender.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, phone: fullPhone, orderType, message }),
-      });
-      if (!proxyResponse.ok) throw new Error('Backup Google Sheets submission failed.');
-
       await saveToFirebase({ name, email, phone: fullPhone, orderType, message });
 
       showStatus('✅ Order sent successfully!', 'green');
@@ -94,3 +81,4 @@
     });
   }
 })();
+
