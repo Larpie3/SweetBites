@@ -1,10 +1,14 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SweetBites — Contact & Order</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <meta name="description" content="Contact SweetBites for orders: pickup, delivery, or custom cake requests.">
+  <meta property="og:image" content="images/contact-banner.jpg">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script defer src="script.js"></script>
 </head>
@@ -17,34 +21,41 @@
       <a href="about.html" class="nav-link">About</a>
       <a href="contact.html" class="nav-link active">Contact</a>
     </nav>
+    <div class="header-actions">
+      <button class="btn-cta" id="theme-toggle" aria-label="Toggle theme">Dark</button>
+      <a href="#order" class="btn-cta">Try Now</a>
+    </div>
   </header>
 
   <main>
-    <section id="order" class="container section-contact">
-      <form id="contactForm" method="POST" class="contact-form">
+    <section class="hero hero-contact fade-up" role="banner" aria-label="Contact hero">
+      <div class="hero-inner container">
+        <h1 class="hero-title">Contact & Orders</h1>
+        <p class="hero-sub">Tell us what you want — we'll reply shortly.</p>
+      </div>
+    </section>
+
+    <section id="order" class="container section-contact fade-up">
+      <form id="contactForm" class="contact-form" method="POST">
         <input type="hidden" name="access_key" value="f4a0d85e-a43d-4074-8220-5c4c74d09726">
 
         <label>Full name
-          <input type="text" name="name" required>
+          <input type="text" name="name" id="name" required>
         </label>
 
         <label>Email
-          <input type="email" name="email" required>
+          <input type="email" name="email" id="email" required>
         </label>
 
-        <label>Phone (+63)
+        <label>Phone (enter 10 digits starting with 9; +63 will be prefixed)
           <div class="phone-row">
             <span class="phone-prefix">+63</span>
-            <input type="tel" name="phone" placeholder="9123456789" required pattern="[0-9]{10}">
+            <input type="tel" name="phone" id="phone" inputmode="numeric" maxlength="10" placeholder="9123456789" required pattern="[0-9]{10}">
           </div>
         </label>
 
-        <label>Address
-          <input type="text" name="address" placeholder="Street, City, Province" required>
-        </label>
-
         <label>Order Type
-          <select name="orderType" required>
+          <select name="orderType" id="orderType" required>
             <option value="">-- Select --</option>
             <option>Pickup</option>
             <option>Delivery</option>
@@ -52,30 +63,31 @@
           </select>
         </label>
 
-        <label>Flavor (optional)
-          <input type="text" name="flavor" placeholder="Chocolate, Vanilla, Ube...">
+        <label>Delivery Address (optional)
+          <input type="text" name="address" id="address" placeholder="Enter delivery address if applicable">
         </label>
 
-        <label>Size (optional)
-          <input type="text" name="size" placeholder="6-inch, 8-inch, dozen, etc.">
+        <label>Message / Order details
+          <textarea name="message" id="message" rows="5" required placeholder="Flavor, size, special instructions..."></textarea>
         </label>
 
-        <label>Special Notes
-          <textarea name="notes" rows="3" placeholder="Add details or requests"></textarea>
-        </label>
-
-        <label>Type the word <strong>SWEET</strong> to confirm
+        <label>Type the word <strong>SWEET</strong> to confirm you're not a bot
           <input type="text" id="captcha" required placeholder="Type SWEET">
         </label>
 
-        <button type="submit" class="btn">Send Order</button>
+        <div class="form-actions">
+          <button type="submit" class="btn">Send Order</button>
+        </div>
+
         <div id="formStatus" aria-live="polite"></div>
       </form>
     </section>
   </main>
 
   <footer class="site-footer">
-    <p>© 2025 SweetBites Bakery</p>
+    <div class="container">
+      <p>© 2025 SweetBites Bakery</p>
+    </div>
   </footer>
 </body>
 </html>
