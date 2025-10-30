@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!web3Response.ok) throw new Error('Web3Forms submission failed.');
 
       // Send to backend proxy (for Firebase)
-      const proxyResponse = await fetch('https://sweetbites-server.onrender.com/submit', {
+      const proxyResponse = await fetch('https://sweetbites-server.onrender.com', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, phone: fullPhone, orderType, message }),
@@ -103,3 +103,4 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 })();
+
