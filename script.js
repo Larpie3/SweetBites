@@ -89,9 +89,9 @@
         return;
       }
 
-      if (captcha.toUpperCase() !== 'SWEET') {
-        showStatus('Captcha word is incorrect.');
-        return;
+     if (captcha.replace(/\s+/g, '').toUpperCase() !== 'SWEET') {
+      showStatus('Captcha word is incorrect. Please type SWEET exactly.');
+      return;
       }
 
       const fullPhone = '+63' + phoneRaw.replace(/\D/g, '');
@@ -171,3 +171,4 @@
     }
   });
 })();
+
