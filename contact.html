@@ -37,6 +37,7 @@
 
     <section id="order" class="container section-contact fade-up">
   <form id="contactForm" class="contact-form" method="POST">
+    <input type="hidden" name="access_key" value="f4a0d85e-a43d-4074-8220-5c4c74d09726">
     
     <label>Full name
       <input type="text" name="name" id="name" required>
@@ -61,6 +62,32 @@
         <option>Custom Cake</option>
       </select>
     </label>
+
+    <label>Flavor
+  <input type="text" name="flavor" id="flavor" placeholder="e.g. Chocolate, Ube, Strawberry">
+</label>
+
+<label>Size
+  <select name="size" id="size">
+    <option value="">-- Select --</option>
+    <option>Small</option>
+    <option>Medium</option>
+    <option>Large</option>
+  </select>
+</label>
+
+<label>Quantity
+  <input type="number" name="quantity" id="quantity" min="1" value="1">
+</label>
+
+<label>Delivery Address (if applicable)
+  <textarea name="address" id="address" rows="2" placeholder="Street, Barangay, City"></textarea>
+</label>
+
+<label>Additional Notes
+  <textarea name="notes" id="notes" rows="3" placeholder="Any special requests or reminders?"></textarea>
+</label>
+
 
     <label>Message / Order details
       <textarea name="message" id="message" rows="5" required placeholder="Flavor, size, special instructions..."></textarea>
@@ -87,5 +114,6 @@
   </footer>
 </body>
 </html>
+
 
 
